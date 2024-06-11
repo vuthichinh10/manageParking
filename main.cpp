@@ -1,12 +1,11 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <cstring>
 #include <math.h>
 #include <stdio.h>
 using namespace std ;
-#define error -1 ;
-#define success 1 ;
+#define error (-1) ;
+#define success (1);
 
 struct data{
     int16_t h ;
@@ -23,7 +22,7 @@ void list_C(vector<data> x){
 	int n = x.size() ;
 	if(n > 0 ){
 		for (int i = 0 ; i < n ; i++){
-			cout << x[i].h << ":" << x[i].m << ":" << x[i].s << "  " << x[i].plate << endl;
+			std::cout << x[i].h << ":" << x[i].m << ":" << x[i].s << "  " << x[i].plate << endl;
 		}
 	}
 
@@ -38,7 +37,6 @@ int find_C(string plate , vector<data> x){
 				return i ;	
 			}
 		}
-		return error ;
 	}
 	return error ;
 }
@@ -46,20 +44,21 @@ int find_C(string plate , vector<data> x){
 int in_C(data a , vector<data> &x){
 	int n = find_C(a.plate , x ) ;
 	if(n != -1){
-	return error ;
+		return error ;
 	}
 	x.push_back(a) ;
 	return success ;
 }
 // cho xe ra bãi 
 int out_C(data a , vector<data> &x){
-	int n = find_C(a.plate , x ) ;
-	if(n != -1){
-		x.erase(x.begin() + n);
-		return success ;
-	}
-	return error ;
+    int n = find_C(a.plate , x ) ;
+    if(n != -1){
+        x.erase(x.begin() + n);
+        return success ;
+    }
+		return error;
 }
+
 
 //tính tổng xe máy có trong bãi
 
@@ -77,7 +76,7 @@ int cnt_moto_C(vector<data> x){
 int bill_C(data a , vector<data> x){
 	int n = find_C(a.plate , x) ;
 	int total = 0 ;
-	if(n == -1){
+	if(n == -1 ){
 		return error ;
 	}
 	int day = ((x[n].h >= 6 && x[n].h < 18) && (a.h > x[n].h && a.h < 18)) || (a.h == x[n].h && a.m > x[n].m);
@@ -113,6 +112,19 @@ int bill_C(data a , vector<data> x){
 	}	
 	return total ;
 }
+//Tính tổng tiền từ khi chương trình chạy
+int billAll_C(vector<data> x , vector<data> y){
+	int n = x.size() ;
+	int billAll = 0 ;
+	int i = 0;
+	if(n > 0){
+		while(i < n){
+			billAll += bill_C(x[i] , y) ;
+			i++;
+		}
+	}
+	return billAll ;
+}
 // Hiển thị thông tin phần input
 void showInput(vector<string> l){
 	int n = l.size() ;
@@ -123,13 +135,13 @@ void showInput(vector<string> l){
 			break ;
 		}
 		if((l[i] == "list") || (l[i] == "cnt-moto") || (l[i] == "*") ){
-			cout << l[i] << endl ;
+			std::cout << l[i] << endl ;
 			i++;
 		}else if((l[i] == "in") || (l[i] == "out") || (l[i] == "bill")){
-			cout << l[i] << " " << l[i+1] << " " << l[i+2] << endl ;
+			std::cout << l[i] << " " << l[i+1] << " " << l[i+2] << endl ;
 			i += 3;
 		}else{
-			cout << l[i] << " " << l[i+1] << endl ;
+			std::cout << l[i] << " " << l[i+1] << endl ;
 			i += 2;
 		}
 	}
@@ -141,12 +153,14 @@ int main(){
 	while(1){
 	vector<data> parking ;
 	vector<string> listInput ;
+	vector<data> listAfterOut ;
+	vector<data> listBeforeOut ;
 // Nhập dữ liệu
-	cout<<"Please enter a list of times and license plates and command ! " <<endl;
+	std::cout<<"Please enter a list of times and license plates and command ! " <<endl;
 	while (1)
 	{
 		string cp = " ";
-		cin>> cp ;
+		std::cin>> cp ;
 		if (cp == "***"){
 			listInput.push_back(cp);
 			break;
@@ -157,7 +171,7 @@ int main(){
  	int n = listInput.size() ;
 	int i = 0 ;
 	if(n>2){
-		cout << "---------------------------------------------------------------" << endl ;
+		std::cout << "---------------------------------------------------------------" << endl ;
 		while (i<n){
 			if(listInput[i] == "*"){
 				i++ ;
@@ -171,11 +185,15 @@ int main(){
 				i++ ;
 			}else if (listInput[i] == "find")
 			{
-				cout << find_C(listInput[i+1] , parking) << endl; 
+				std::cout << find_C(listInput[i+1] , parking) << endl; 
 				i += 2 ;
+			}else if(listInput[i] == "billall"){
+				std::cout<< billAll_C(listAfterOut , listBeforeOut) << endl ;
+				i++;
+
 			}else if (listInput[i] == "cnt-moto")
 			{
-				cout << cnt_moto_C(parking) << endl ;
+				std::cout << cnt_moto_C(parking) << endl ;
 				i++ ;
 			}else if (listInput[i] == "in")
 			{	
@@ -190,7 +208,7 @@ int main(){
 				s2 = charToInt(listInput[i+1][7]) ;
 				s = s1*10 + s2 ;
 				data a = {h ,m, s , listInput[i+2]} ;
-				cout << in_C(a , parking) << endl ;
+				std::cout << in_C(a , parking) << endl ;
 				i += 3 ;
 			}else if (listInput[i] == "out")
 			{
@@ -205,7 +223,13 @@ int main(){
 				s2 = charToInt(listInput[i+1][7]) ;
 				s = s1*10 + s2 ;
 				data a = {h ,m, s , listInput[i+2]} ;
-				cout << out_C(a , parking) << endl ;
+				int index = find_C(listInput[i+2], parking) ;
+				if(index != -1)
+				{
+					listBeforeOut.push_back(parking[index]) ;
+				}
+				listAfterOut.push_back(a); 
+				std::cout << out_C(a , parking) << endl ;
 				i += 3 ;
 			}else if (listInput[i] == "bill")
 			{
@@ -220,7 +244,7 @@ int main(){
 				s2 = charToInt(listInput[i+1][7]) ;
 				s = s1*10 + s2 ;
 				data a = {h ,m, s , listInput[i+2]} ;
-				cout << bill_C(a,parking) << endl ;
+				std::cout << bill_C(a,parking) << endl ;
 				i += 3 ;
 			}else{
 				int h1 , h2 , h , m1 , m2 , m , s1 , s2 , s ;
@@ -241,11 +265,11 @@ int main(){
 		}
 		
 	}
-	cout<< "Enter 'N' to exit , 'Y' to continue test" << endl;
-	cin >> state ;
+	std::cout<< "Enter 'N' to exit , 'Y' to continue test" << endl;
+	std::cin >> state ;
 	if(state == 'N'){
 		break;
 	}
-	}
+}
 return 0 ;
 }
